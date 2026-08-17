@@ -453,3 +453,18 @@ CREATE POLICY "staff_autenticado" ON resumenes_mensuales
 --      solo usuarios presentes en la tabla "usuarios" pueden leer/escribir).
 --   3. Nunca generar URLs públicas para el bucket — solo signed URLs de
 --      corta duración desde el cliente autenticado.
+
+-- ==============================================================================
+-- 13. PERMISOS DE ROL (GRANT)
+-- RLS por sí solo no basta: sin GRANT, Postgres niega el acceso a la tabla
+-- antes de evaluar las políticas ("permission denied for table ..."). Solo
+-- se otorga a "authenticated" -- no hay acceso anónimo en este MVP, toda
+-- operación exige sesión (ver políticas arriba).
+-- ==============================================================================
+GRANT USAGE ON SCHEMA public TO authenticated;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON
+    usuarios, personas, propiedades, contratos, pagos, gastos, documentos, resumenes_mensuales
+TO authenticated;
+
+GRANT SELECT ON pagos_estatus, actividad_reciente TO authenticated;
